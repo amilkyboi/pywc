@@ -74,17 +74,26 @@ def main() -> None:
         args.lines = True
         args.words = True
 
+    counts: dict[str, int] = {'lines': 0, 'words': 0, 'chars': 0, 'bytes': 0}
+
     if args.bytes:
-        print(f"bytes: {get_num_bytes(filepath)}")
+        counts['bytes'] = get_num_bytes(filepath)
 
     if args.chars:
-        print(f"chars: {get_num_chars(filepath)}")
+        counts['chars'] = get_num_chars(filepath)
 
     if args.lines:
-        print(f"lines: {get_num_lines(filepath)}")
+        counts['lines'] = get_num_lines(filepath)
 
     if args.words:
-        print(f"words: {get_num_words(filepath)}")
+        counts['words'] = get_num_words(filepath)
+
+    # The options are always printed in the following order: lines, words, chars, bytes (following
+    # convention from wc)
+    ordered_counts: list[int] = [counts[key] for key in ['lines', 'words', 'chars', 'bytes']
+                                 if counts[key] != 0]
+
+    print(' '.join(map(str, ordered_counts)), filepath)
 
 if __name__ == "__main__":
     main()
