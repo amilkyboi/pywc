@@ -74,7 +74,7 @@ def main() -> None:
         args.lines = True
         args.words = True
 
-    counts: dict[str, int] = {'lines': 0, 'words': 0, 'chars': 0, 'bytes': 0}
+    counts: dict = {'lines': None, 'words': None, 'chars': None, 'bytes': None}
 
     if args.bytes:
         counts['bytes'] = get_num_bytes(filepath)
@@ -91,7 +91,7 @@ def main() -> None:
     # The options are always printed in the following order: lines, words, chars, bytes (following
     # convention from wc)
     ordered_counts: list[int] = [counts[key] for key in ['lines', 'words', 'chars', 'bytes']
-                                 if counts[key] != 0]
+                                if counts[key] is not None]
 
     print(' '.join(map(str, ordered_counts)), filepath)
 
