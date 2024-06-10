@@ -1,8 +1,8 @@
 # module main
 
 FILEPATH: str = "../data/test.txt"
-# In order to support multibyte strings, UTF-8 encoding is used; to use locale-specific encoding,
-# locale.getencoding() would have to be used
+# In order to support multibyte strings, UTF-8 encoding is used; for locale-specific encoding,
+# locale.getencoding() would have to be used instead
 # https://docs.python.org/3/library/locale.html#locale.getencoding
 ENCODING: str = "utf-8"
 
