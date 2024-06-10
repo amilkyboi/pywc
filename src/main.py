@@ -23,6 +23,8 @@ def get_num_bytes(filepath: str) -> int:
     return num_bytes
 
 def get_num_chars(filepath: str) -> int:
+    # TODO: 06/10/24 - If the current locale does not support multibyte characters this should match
+    #       the number of bytes
     with open(filepath, "rb") as file:
         byte_data: bytes = file.read()
         utf_data:  str   = byte_data.decode(ENCODING)
@@ -65,7 +67,7 @@ def main() -> None:
 
     if filepath is None:
         # TODO: 06/10/24 - Enable reading from stdin if no filename is provided
-        print('No file path provided.')
+        print("No file path provided.")
         return
 
     if not any([args.bytes, args.chars, args.lines, args.words]):
@@ -74,23 +76,23 @@ def main() -> None:
         args.lines = True
         args.words = True
 
-    counts: dict = {'lines': None, 'words': None, 'chars': None, 'bytes': None}
+    counts: dict = {"lines": None, "words": None, "chars": None, "bytes": None}
 
     if args.bytes:
-        counts['bytes'] = get_num_bytes(filepath)
+        counts["bytes"] = get_num_bytes(filepath)
 
     if args.chars:
-        counts['chars'] = get_num_chars(filepath)
+        counts["chars"] = get_num_chars(filepath)
 
     if args.lines:
-        counts['lines'] = get_num_lines(filepath)
+        counts["lines"] = get_num_lines(filepath)
 
     if args.words:
-        counts['words'] = get_num_words(filepath)
+        counts["words"] = get_num_words(filepath)
 
     # The options are always printed in the following order: lines, words, chars, bytes (following
     # convention from wc)
-    ordered_counts: list[int] = [counts[key] for key in ['lines', 'words', 'chars', 'bytes']
+    ordered_counts: list[int] = [counts[key] for key in ["lines", "words", "chars", "bytes"]
                                 if counts[key] is not None]
 
     print(' '.join(map(str, ordered_counts)), filepath)
