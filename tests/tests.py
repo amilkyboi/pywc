@@ -13,6 +13,10 @@ class TestFunctions(unittest.TestCase):
         expected_bytes: int = 342190
         self.assertEqual(get_num_bytes(FILEPATH), expected_bytes)
 
+    def test_get_num_chars(self):
+        expected_chars: int = 339292
+        self.assertEqual(get_num_chars(FILEPATH), expected_chars)
+
     def test_get_num_lines(self):
         expected_lines: int = 7145
         self.assertEqual(get_num_lines(FILEPATH), expected_lines)
@@ -20,10 +24,6 @@ class TestFunctions(unittest.TestCase):
     def test_get_num_words(self):
         expected_words: int = 58164
         self.assertEqual(get_num_words(FILEPATH), expected_words)
-
-    def test_get_num_chars(self):
-        expected_chars: int = 339292
-        self.assertEqual(get_num_chars(FILEPATH), expected_chars)
 
 if __name__ == "__main__":
     unittest.main()

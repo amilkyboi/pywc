@@ -1,6 +1,7 @@
 # module main
 
-FILEPATH: str = "../data/test.txt"
+from argparse import ArgumentParser, Namespace
+
 # In order to support multibyte strings, UTF-8 encoding is used; for locale-specific encoding,
 # locale.getencoding() would have to be used instead
 # https://docs.python.org/3/library/locale.html#locale.getencoding
@@ -21,6 +22,14 @@ def get_num_bytes(filepath: str) -> int:
 
     return num_bytes
 
+def get_num_chars(filepath: str) -> int:
+    with open(filepath, "rb") as file:
+        byte_data: bytes = file.read()
+        utf_data:  str   = byte_data.decode(ENCODING)
+        num_chars: int   = len(utf_data)
+
+    return num_chars
+
 def get_num_lines(filepath: str) -> int:
     with open(filepath, 'r', encoding=ENCODING) as file:
         num_lines: int = len(file.readlines())
@@ -38,19 +47,44 @@ def get_num_words(filepath: str) -> int:
 
     return num_words
 
-def get_num_chars(filepath: str) -> int:
-    with open(filepath, "rb") as file:
-        byte_data: bytes = file.read()
-        utf_data:  str   = byte_data.decode(ENCODING)
-        num_chars: int   = len(utf_data)
-
-    return num_chars
-
 def main() -> None:
-    print(f"bytes: {get_num_bytes(FILEPATH)}")
-    print(f"lines: {get_num_lines(FILEPATH)}")
-    print(f"words: {get_num_words(FILEPATH)}")
-    print(f"chars: {get_num_chars(FILEPATH)}")
+    parser: ArgumentParser = ArgumentParser()
+
+    parser.add_argument("-c", "--bytes", help="print the byte counts",      action="store_true")
+    parser.add_argument("-m", "--chars", help="print the character counts", action="store_true")
+    parser.add_argument("-l", "--lines", help="print the newline counts",   action="store_true")
+    parser.add_argument("-w", "--words", help="print the word counts",      action="store_true")
+    # The `nargs='?'` means one argument will be consumed from the command line if possible; if no
+    # command-line argument is present, the value from default will be produced
+    # https://docs.python.org/3/library/argparse.html#nargs
+    parser.add_argument("filepath", help="location of the file", nargs='?', type=str, default=None)
+
+    args: Namespace = parser.parse_args()
+
+    filepath: str = args.filepath
+
+    if filepath is None:
+        # TODO: 06/10/24 - Enable reading from stdin if no filename is provided
+        print('No file path provided.')
+        return
+
+    if not any([args.bytes, args.chars, args.lines, args.words]):
+        # If no arguments are provided, enable -c, -l and -w by default as in wc
+        args.bytes = True
+        args.lines = True
+        args.words = True
+
+    if args.bytes:
+        print(f"bytes: {get_num_bytes(filepath)}")
+
+    if args.chars:
+        print(f"chars: {get_num_chars(filepath)}")
+
+    if args.lines:
+        print(f"lines: {get_num_lines(filepath)}")
+
+    if args.words:
+        print(f"words: {get_num_words(filepath)}")
 
 if __name__ == "__main__":
     main()
