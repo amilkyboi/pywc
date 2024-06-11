@@ -1,4 +1,7 @@
 # module main
+"""
+An implementation of GNU wc in Python.
+"""
 
 import sys
 from pathlib import Path
@@ -10,22 +13,42 @@ from argparse import ArgumentParser, Namespace
 ENCODING: str = "utf-8"
 
 def get_num_bytes(byte_data: bytes) -> int:
+    """
+    Returns the number of bytes in a byte stream.
+    """
+
     return len(byte_data)
 
 def get_num_chars(str_data: str) -> int:
+    """
+    Returns the number of characters in a string stream.
+    """
+
     # TODO: 06/10/24 - If the current locale does not support multibyte characters this should match
     #       the number of bytes
     return len(str_data)
 
 def get_num_lines(str_data: str) -> int:
+    """
+    Returns the number of lines in a string stream.
+    """
+
     return len(str_data.splitlines())
 
 def get_num_words(str_data: str) -> int:
+    """
+    Returns the number of words in a string stream.
+    """
+
     # Split by any whitespace character (including `\n`, `\r`, `\t`, `\f`, and spaces) and remove
     # empty strings
     return len(str_data.split())
 
 def get_args() -> Namespace:
+    """
+    Returns all possible command line arguments.
+    """
+
     parser: ArgumentParser = ArgumentParser(
                                 prog="pywc",
                                 description="Print lines, words, and bytes for the specified file.")
@@ -41,6 +64,10 @@ def get_args() -> Namespace:
     return parser.parse_args()
 
 def get_ordered_counts(args: Namespace, byte_data: bytes, str_data: str) -> list[int]:
+    """
+    Returns the number of lines, words, chars, bytes, in that order.
+    """
+
     if not any([args.bytes, args.chars, args.lines, args.words]):
         # If no arguments are provided, enable -c, -l and -w by default as in wc
         args.bytes = True
@@ -66,6 +93,10 @@ def get_ordered_counts(args: Namespace, byte_data: bytes, str_data: str) -> list
     return [counts[key] for key in ["lines", "words", "chars", "bytes"] if counts[key] is not None]
 
 def parse_from_files(args: Namespace) -> None:
+    """
+    Parses data from files.
+    """
+
     file_strs: list[str] = args.filepaths
 
     for file_str in file_strs:
@@ -93,7 +124,11 @@ def parse_from_files(args: Namespace) -> None:
 
         print(' '.join(map(str, ordered_counts)), file_path)
 
-def parse_from_data(args: Namespace) -> None:
+def parse_from_stdin(args: Namespace) -> None:
+    """
+    Parses data from stdin.
+    """
+
     str_data  = sys.stdin.read()
     byte_data = str_data.encode(ENCODING)
 
@@ -102,6 +137,10 @@ def parse_from_data(args: Namespace) -> None:
     print(' '.join(map(str, ordered_counts)))
 
 def main() -> None:
+    """
+    Runs the program.
+    """
+
     args: Namespace = get_args()
 
     # Read from standard input if no filepaths are specified
@@ -109,7 +148,7 @@ def main() -> None:
         # NOTE: 06/11/24 - Reads the entire stdin into a single stream in memory, potentially
         #       problematic for very large files
         try:
-            parse_from_data(args)
+            parse_from_stdin(args)
         except KeyboardInterrupt:
             # Behaves the same as wc if no input is piped into it
             sys.exit(1)
