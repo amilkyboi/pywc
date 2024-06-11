@@ -34,7 +34,9 @@ def get_num_words(str_data: str) -> int:
     return num_words
 
 def main() -> None:
-    parser: ArgumentParser = ArgumentParser()
+    parser: ArgumentParser = ArgumentParser(
+                                prog="pywc",
+                                description="Print lines, words, and bytes for the specified file.")
 
     parser.add_argument("-c", "--bytes", help="print the byte counts",      action="store_true")
     parser.add_argument("-m", "--chars", help="print the character counts", action="store_true")
@@ -54,8 +56,12 @@ def main() -> None:
     if args.filepath is None:
         # NOTE: 06/11/24 - Reads the entire stdin into a single stream in memory, potentially
         #       problematic for very large files
-        str_data  = sys.stdin.read()
-        byte_data = str_data.encode(ENCODING)
+        try:
+            str_data  = sys.stdin.read()
+            byte_data = str_data.encode(ENCODING)
+        except KeyboardInterrupt:
+            # Behaves the same as wc if no input is piped into it
+            sys.exit(1)
     else:
         filepath: Path = Path(args.filepath)
 
