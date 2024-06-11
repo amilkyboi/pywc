@@ -1,5 +1,7 @@
 # module main
 
+import sys
+from pathlib import Path
 from argparse import ArgumentParser, Namespace
 
 # In order to support multibyte strings, UTF-8 encoding is used; for locale-specific encoding,
@@ -7,7 +9,7 @@ from argparse import ArgumentParser, Namespace
 # https://docs.python.org/3/library/locale.html#locale.getencoding
 ENCODING: str = "utf-8"
 
-def get_num_bytes(filepath: str) -> int:
+def get_num_bytes(filepath: Path) -> int:
     # For reading and writing raw bytes use binary mode and leave encoding unspecified
     # https://docs.python.org/3/library/functions.html#open
     with open(filepath, "rb") as file:
@@ -22,7 +24,7 @@ def get_num_bytes(filepath: str) -> int:
 
     return num_bytes
 
-def get_num_chars(filepath: str) -> int:
+def get_num_chars(filepath: Path) -> int:
     # TODO: 06/10/24 - If the current locale does not support multibyte characters this should match
     #       the number of bytes
     with open(filepath, "rb") as file:
@@ -32,13 +34,13 @@ def get_num_chars(filepath: str) -> int:
 
     return num_chars
 
-def get_num_lines(filepath: str) -> int:
+def get_num_lines(filepath: Path) -> int:
     with open(filepath, 'r', encoding=ENCODING) as file:
         num_lines: int = len(file.readlines())
 
     return num_lines
 
-def get_num_words(filepath: str) -> int:
+def get_num_words(filepath: Path) -> int:
     with open(filepath, 'r', encoding=ENCODING) as file:
         # Read the entire file into a single string, then split by any whitespace character
         # (including `\n`, `\r`, `\t`, `\f`, and spaces) and remove empty strings
@@ -63,12 +65,23 @@ def main() -> None:
 
     args: Namespace = parser.parse_args()
 
-    filepath: str = args.filepath
-
-    if filepath is None:
+    # Ensure the filepath exists before converting the string to a Path object
+    if args.filepath is None:
         # TODO: 06/10/24 - Enable reading from stdin if no filename is provided
-        print("No file path provided.")
-        return
+        print("ERROR: no filepath provided")
+        sys.exit(1)
+
+    filepath: Path = Path(args.filepath)
+
+    # Ensure the requested filepath exists
+    if not filepath.exists():
+        print(f"ERROR: {filepath} not found")
+        sys.exit(1)
+
+    # Ensure the requested filepath is a file (or symlink)
+    if not filepath.is_file():
+        print(f"ERROR: {filepath} is not a file")
+        sys.exit(1)
 
     if not any([args.bytes, args.chars, args.lines, args.words]):
         # If no arguments are provided, enable -c, -l and -w by default as in wc
@@ -93,7 +106,7 @@ def main() -> None:
     # The options are always printed in the following order: lines, words, chars, bytes (following
     # convention from wc)
     ordered_counts: list[int] = [counts[key] for key in ["lines", "words", "chars", "bytes"]
-                                if counts[key] is not None]
+                                 if counts[key] is not None]
 
     print(' '.join(map(str, ordered_counts)), filepath)
 
